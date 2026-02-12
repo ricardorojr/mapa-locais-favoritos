@@ -3,14 +3,14 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import type { LatLngExpression } from "leaflet";
 import "leaflet/dist/leaflet.css";
+import markerIcon from "leaflet/dist/images/marker-icon.png";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
+import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 import ChangeView from "./MapComponent/ChangeView";
 import ClickHandler from "./MapComponent/ClickHandler";
 import SearchBar from "./MapComponent/SearchBar";
-
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import { useReverseLocation } from "../../hooks/useLocation";
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -21,47 +21,67 @@ const DefaultIcon = L.icon({
   popupAnchor: [1, -34],
   shadowSize: [41, 41],
 });
+
+// Isso aplica o ícone para todos os marcadores do projeto
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const DEFAULT_POSITION: LatLngExpression = [-18.9186, -48.2772];
-const DEFAULT_ZOOM = 13;
 
 export default function MapWidget() {
-  const [markerPosition, setMarkerPosition] = useState<LatLngExpression | null>(
-    null,
+  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
+  const [manualAddress, setManualAddress] = useState<string>("");
+  const { data: reverseData, isFetching } = useReverseLocation(
+    markerPosition?.[0],
+    markerPosition?.[1],
   );
 
+  const handleMapClick = (lat: number, lng: number) => {
+    setManualAddress("");
+    setMarkerPosition([lat, lng]);
+  };
+
+  const handleSearchResult = (pos: LatLngExpression, label: string) => {
+    setMarkerPosition(pos as [number, number]);
+    setManualAddress(label);
+  };
+
+  const displayAddress = isFetching
+    ? "Buscando endereço..."
+    : manualAddress ||
+      reverseData?.display_name ||
+      "Clique no mapa para localizar";
+
   return (
-    <div className="h-[600px] w-full flex flex-row relative">
+    <div className="h-[600px] w-full flex flex-row relative border rounded-xl overflow-hidden shadow-lg">
       <MapContainer
         center={DEFAULT_POSITION}
-        zoom={DEFAULT_ZOOM}
-        className="h-full w-full"
+        zoom={13}
+        className="h-full w-full z-0"
       >
         {markerPosition && <ChangeView center={markerPosition} />}
 
         <TileLayer
-          attribution="© OpenStreetMap contributors"
+          attribution='&copy; <a href="https://www.openstreetmap.org">OpenStreetMap</a>'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <ClickHandler onClick={(lat, lng) => setMarkerPosition([lat, lng])} />
+        <ClickHandler onClick={handleMapClick} />
 
         {markerPosition && (
           <Marker position={markerPosition}>
-            {Array.isArray(markerPosition) ? (
-              <Popup>
-                Latitude: {markerPosition[0].toFixed(5)}, Longitude:{" "}
-                {markerPosition[1].toFixed(5)}
-              </Popup>
-            ) : (
-              <Popup>Local selecionado</Popup>
-            )}
+            <Popup key={displayAddress}>
+              <div className="text-sm p-1 max-w-[200px]">
+                <strong className="text-emerald-700 block mb-1">
+                  Localização:
+                </strong>
+                <p className="text-slate-600 leading-tight">{displayAddress}</p>
+              </div>
+            </Popup>
           </Marker>
         )}
       </MapContainer>
 
-      <SearchBar onSearch={(pos) => setMarkerPosition(pos)} />
+      <SearchBar onSearch={handleSearchResult} />
     </div>
   );
 }
