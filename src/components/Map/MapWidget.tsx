@@ -27,7 +27,12 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 const DEFAULT_POSITION: LatLngExpression = [-18.9186, -48.2772];
 
-export default function MapWidget() {
+interface MapWidgetProps {
+  onSave: (location: FavoriteLocation) => void;
+  focusCoords: [number, number] | null;
+}
+
+export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
   const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(
     null,
   );
@@ -39,15 +44,15 @@ export default function MapWidget() {
 
   const markerRef = useRef<L.Marker>(null);
 
-  const handleMapClick = (lat: number, lng: number) => {
-    setManualAddress("");
-    setMarkerPosition([lat, lng]);
-  };
-
   const handleSearchResult = (pos: LatLngExpression) => {
     setMarkerPosition(pos as [number, number]);
     setManualAddress("");
   };
+
+  const updateLocation = (coords: [number, number]) => {
+  setManualAddress("");
+  setMarkerPosition(coords);
+};
 
   const displayAddress = isFetching
     ? ["Buscando endereço..."]
@@ -72,6 +77,14 @@ export default function MapWidget() {
     }
   }, [markerPosition, reverseData]);
 
+  useEffect(() => {
+  if (focusCoords) {
+    requestAnimationFrame(() => {
+      updateLocation(focusCoords);
+    });
+  }
+}, [focusCoords]);
+
   return (
     <div className="h-[600px] w-full flex flex-row relative border rounded-xl overflow-hidden shadow-lg">
       <MapContainer
@@ -86,7 +99,7 @@ export default function MapWidget() {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
 
-        <ClickHandler onClick={handleMapClick} />
+        <ClickHandler onClick={(lat, lng) => updateLocation([lat, lng])} />
 
         {markerPosition && (
           <Marker position={markerPosition} ref={markerRef}>

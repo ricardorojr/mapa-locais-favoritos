@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { LatLngExpression } from "leaflet";
-import { MyInput } from "../../UI/MyInput";
-import { MyButton } from "../../UI/MyButton";
+import { TextInput } from "../../UI/TextInput";
+import { ButtonBase } from "../../UI/ButtonBase";
 import { useSearchLocation } from "../../../hooks/useLocation";
 
 interface SearchBarProps {
@@ -9,23 +9,23 @@ interface SearchBarProps {
 }
 
 export default function SearchBar({ onSearch }: SearchBarProps) {
-  const [query, setQuery] = useState("");
+  const [value, setValue] = useState("");
   const [notFound, setNotFound] = useState(false);
 
   const { mutateAsync: searchLocation, isPending } = useSearchLocation();
 
   const handleSearch = async () => {
-    if (!query.trim()) return;
+    if (!value.trim()) return;
     setNotFound(false);
 
     try {
-      const data = await searchLocation(query);
+      const data = await searchLocation(value);
 
       if (data) {
         const lat = parseFloat(data.lat);
         const lon = parseFloat(data.lon);
         onSearch([lat, lon], data.display_name);
-        setQuery("");
+        setValue("");
       } else {
         setNotFound(true);
       }
@@ -41,10 +41,10 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         Buscar Localização
       </h3>
 
-      <MyInput
-        value={query}
+      <TextInput
+        value={value}
         onChange={(e) => {
-          setQuery(e.target.value);
+          setValue(e.target.value);
           if (notFound) setNotFound(false);
         }}
         placeholder="Rua, Cidade, UF..."
@@ -54,15 +54,16 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
         error={notFound}
       />
 
-      <div className="mt-1">
-        <MyButton
-          onClick={handleSearch}
-          className="w-full"
-          disabled={isPending}
-        >
-          {isPending ? "Buscando..." : "Buscar"}
-        </MyButton>
-      </div>
+      <ButtonBase
+        onClick={handleSearch}
+        className="w-full"
+        isLoading={isPending}
+        variant="primary"
+        disabled={!value}
+        size="md"
+      >
+        Buscar
+      </ButtonBase>
     </div>
   );
 }
