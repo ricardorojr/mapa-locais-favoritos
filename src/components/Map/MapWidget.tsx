@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 import type { LatLngExpression } from "leaflet";
@@ -6,6 +6,7 @@ import "leaflet/dist/leaflet.css";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import type { FavoriteLocation } from "../../types/address";
 
 import ChangeView from "./MapComponent/ChangeView";
 import ClickHandler from "./MapComponent/ClickHandler";
@@ -22,34 +23,54 @@ const DefaultIcon = L.icon({
   shadowSize: [41, 41],
 });
 
-// Isso aplica o ícone para todos os marcadores do projeto
 L.Marker.prototype.options.icon = DefaultIcon;
 
 const DEFAULT_POSITION: LatLngExpression = [-18.9186, -48.2772];
 
 export default function MapWidget() {
-  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
+  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(
+    null,
+  );
   const [manualAddress, setManualAddress] = useState<string>("");
   const { data: reverseData, isFetching } = useReverseLocation(
     markerPosition?.[0],
     markerPosition?.[1],
   );
 
+  const markerRef = useRef<L.Marker>(null);
+
   const handleMapClick = (lat: number, lng: number) => {
     setManualAddress("");
     setMarkerPosition([lat, lng]);
   };
 
-  const handleSearchResult = (pos: LatLngExpression, label: string) => {
+  const handleSearchResult = (pos: LatLngExpression) => {
     setMarkerPosition(pos as [number, number]);
-    setManualAddress(label);
+    setManualAddress("");
   };
 
   const displayAddress = isFetching
-    ? "Buscando endereço..."
-    : manualAddress ||
-      reverseData?.display_name ||
-      "Clique no mapa para localizar";
+    ? ["Buscando endereço..."]
+    : reverseData?.address
+      ? [
+          `${reverseData.address.road ?? ""}`,
+          `Bairro: ${reverseData.address.suburb ?? reverseData.address.neighbourhood ?? ""}`,
+          `Cidade: ${reverseData.address.city ?? ""}`,
+          `Estado: ${reverseData.address.state ?? ""}`,
+          `País: ${reverseData.address.country ?? ""}`,
+        ].filter((line) => line.length > 0 && !line.endsWith(": "))
+      : manualAddress
+        ? [manualAddress]
+        : ["Clique no mapa para localizar"];
+
+  useEffect(() => {
+    if (markerRef.current) {
+      const timer = setTimeout(() => {
+        markerRef.current?.openPopup();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [markerPosition, reverseData]);
 
   return (
     <div className="h-[600px] w-full flex flex-row relative border rounded-xl overflow-hidden shadow-lg">
@@ -68,13 +89,41 @@ export default function MapWidget() {
         <ClickHandler onClick={handleMapClick} />
 
         {markerPosition && (
-          <Marker position={markerPosition}>
-            <Popup key={displayAddress}>
+          <Marker position={markerPosition} ref={markerRef}>
+            <Popup
+              autoPan={true}
+              closeOnClick={false}
+              key={`popup-${markerPosition[0]}-${markerPosition[1]}`}
+            >
               <div className="text-sm p-1 max-w-[200px]">
                 <strong className="text-emerald-700 block mb-1">
                   Localização:
                 </strong>
-                <p className="text-slate-600 leading-tight">{displayAddress}</p>
+                <p className="text-slate-600 leading-tight">
+                  {isFetching
+                    ? "Buscando endereço..."
+                    : displayAddress.map((addr, i) => (
+                        <span key={i}>
+                          {addr}
+                          <br />
+                        </span>
+                      ))}
+                </p>
+                {!isFetching && (
+                  <button
+                    onClick={() =>
+                      onSave({
+                        id: crypto.randomUUID(),
+                        name: displayAddress[0] || "Local Selecionado",
+                        address: displayAddress.join(", "),
+                        coords: markerPosition,
+                      })
+                    }
+                    className="mt-2 w-full bg-emerald-600 text-white rounded py-1.5 text-xs font-bold"
+                  >
+                    ⭐ Salvar Favorito
+                  </button>
+                )}
               </div>
             </Popup>
           </Marker>
