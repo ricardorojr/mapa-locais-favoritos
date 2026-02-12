@@ -39,7 +39,7 @@ export function ButtonBase({
       className={cn(
         "inline-flex items-center justify-center gap-2 rounded-lg font-bold transition-all duration-200",
         "cursor-pointer shadow-sm disabled:opacity-50 disabled:cursor-not-allowed",
-        "data-[focus]:outline data-[focus]:outline-2 data-[focus]:outline-offset-2",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-500",
         variants[variant],
         sizes[size],
         className,

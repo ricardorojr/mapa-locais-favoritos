@@ -8,10 +8,12 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import type { FavoriteLocation } from "../../types/address";
 
-import ChangeView from "./MapComponent/ChangeView";
-import ClickHandler from "./MapComponent/ClickHandler";
-import SearchBar from "./MapComponent/SearchBar";
+import ChangeView from "./MapComponents/ChangeView";
+import ClickHandler from "./MapComponents/ClickHandler";
+import SearchBar from "./MapComponents/SearchBar";
 import { useReverseLocation } from "../../hooks/useLocation";
+import { LocationPopup } from "./MapComponents/LocationPopup";
+import { useFormattedAddress } from "../../hooks/useFormattedAddress";
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -33,117 +35,62 @@ interface MapWidgetProps {
 }
 
 export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
-  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(
-    null,
-  );
-  const [manualAddress, setManualAddress] = useState<string>("");
-  const { data: reverseData, isFetching } = useReverseLocation(
-    markerPosition?.[0],
-    markerPosition?.[1],
-  );
-
+  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
   const markerRef = useRef<L.Marker>(null);
 
-  const handleSearchResult = (pos: LatLngExpression) => {
-    setMarkerPosition(pos as [number, number]);
-    setManualAddress("");
-  };
+  const { data: reverseData, isFetching } = useReverseLocation(
+    markerPosition?.[0], 
+    markerPosition?.[1]
+  );
+
+  const addressLines = useFormattedAddress(reverseData, isFetching);
 
   const updateLocation = (coords: [number, number]) => {
-  setManualAddress("");
-  setMarkerPosition(coords);
-};
+    setMarkerPosition(coords);
+  };
 
-  const displayAddress = isFetching
-    ? ["Buscando endereço..."]
-    : reverseData?.address
-      ? [
-          `${reverseData.address.road ?? ""}`,
-          `Bairro: ${reverseData.address.suburb ?? reverseData.address.neighbourhood ?? ""}`,
-          `Cidade: ${reverseData.address.city ?? ""}`,
-          `Estado: ${reverseData.address.state ?? ""}`,
-          `País: ${reverseData.address.country ?? ""}`,
-        ].filter((line) => line.length > 0 && !line.endsWith(": "))
-      : manualAddress
-        ? [manualAddress]
-        : ["Clique no mapa para localizar"];
+  useEffect(() => {
+    if (focusCoords) requestAnimationFrame(() => updateLocation(focusCoords));
+  }, [focusCoords]);
 
   useEffect(() => {
     if (markerRef.current) {
-      const timer = setTimeout(() => {
-        markerRef.current?.openPopup();
-      }, 100);
+      const timer = setTimeout(() => markerRef.current?.openPopup(), 100);
       return () => clearTimeout(timer);
     }
   }, [markerPosition, reverseData]);
 
-  useEffect(() => {
-  if (focusCoords) {
-    requestAnimationFrame(() => {
-      updateLocation(focusCoords);
-    });
-  }
-}, [focusCoords]);
-
   return (
-    <div className="h-[600px] w-full flex flex-row relative border rounded-xl overflow-hidden shadow-lg">
-      <MapContainer
-        center={DEFAULT_POSITION}
-        zoom={13}
-        className="h-full w-full z-0"
-      >
+    <div className="h-[80vh] w-full flex flex-row relative border rounded-xl overflow-hidden shadow-lg border-secondary-200">
+      <MapContainer center={DEFAULT_POSITION} zoom={13} className="h-full w-full z-0">
         {markerPosition && <ChangeView center={markerPosition} />}
-
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        
+        <TileLayer 
+          attribution='&copy; OpenStreetMap' 
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
         />
 
         <ClickHandler onClick={(lat, lng) => updateLocation([lat, lng])} />
 
         {markerPosition && (
           <Marker position={markerPosition} ref={markerRef}>
-            <Popup
-              autoPan={true}
-              closeOnClick={false}
-              key={`popup-${markerPosition[0]}-${markerPosition[1]}`}
-            >
-              <div className="text-sm p-1 max-w-[200px]">
-                <strong className="text-emerald-700 block mb-1">
-                  Localização:
-                </strong>
-                <p className="text-slate-600 leading-tight">
-                  {isFetching
-                    ? "Buscando endereço..."
-                    : displayAddress.map((addr, i) => (
-                        <span key={i}>
-                          {addr}
-                          <br />
-                        </span>
-                      ))}
-                </p>
-                {!isFetching && (
-                  <button
-                    onClick={() =>
-                      onSave({
-                        id: crypto.randomUUID(),
-                        name: displayAddress[0] || "Local Selecionado",
-                        address: displayAddress.join(", "),
-                        coords: markerPosition,
-                      })
-                    }
-                    className="mt-2 w-full bg-emerald-600 text-white rounded py-1.5 text-xs font-bold"
-                  >
-                    ⭐ Salvar Favorito
-                  </button>
-                )}
-              </div>
+            <Popup autoPan key={`popup-${markerPosition[0]}-${markerPosition[1]}`}>
+              <LocationPopup 
+                addressLines={addressLines}
+                isFetching={isFetching}
+                onSave={() => onSave({
+                  id: crypto.randomUUID(),
+                  name: addressLines[0] || "Local Selecionado",
+                  address: addressLines.join(", "),
+                  coords: markerPosition,
+                })}
+              />
             </Popup>
           </Marker>
         )}
       </MapContainer>
 
-      <SearchBar onSearch={handleSearchResult} />
+      <SearchBar onSearch={(pos) => updateLocation(pos as [number, number])} />
     </div>
   );
 }

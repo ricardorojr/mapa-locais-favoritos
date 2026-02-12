@@ -27,11 +27,11 @@ export function TextInput({
         className={cn(
           "w-full rounded-lg border bg-white py-2 px-4 text-sm transition-all duration-200 shadow-sm",
           "placeholder:text-secondary-600 text-secondary-900",
-          "border-secondary-600 data-[hover]:border-secondary-900",
-          "data-[focus]:outline-2 data-[focus]:outline-primary-500 data-[focus]:border-transparent",
+          "border-secondary-600 hover:border-secondary-900",
+          "focus:outline-2 focus:outline-primary-500 focus:outline-offset-2 outline-none",
           error && [
             "border-alert-danger text-alert-danger",
-            "data-[focus]:outline-alert-danger data-[focus]:border-transparent",
+            "disabled:opacity-50 disabled:bg-secondary-50 disabled:cursor-not-allowed",
             "placeholder:text-alert-danger/50",
           ],
           "disabled:opacity-none disabled:bg-secondary-50 disabled:cursor-not-allowed",

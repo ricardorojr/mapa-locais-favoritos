@@ -1,6 +1,11 @@
 import { useState } from "react";
 import MapWidget from "../../components/Map/MapWidget";
 import type { FavoriteLocation } from "../../types/address";
+import { ButtonBase } from "../../components/UI/ButtonBase";
+import { EmptyState } from "../../components/Favorites/EmptyListFavorite";
+import { FavoriteCard } from "../../components/Favorites/FavoriteCard";
+import { StarIcon } from "../../assets/icons/StarIcon";
+import { TrashIcon } from "../../assets/icons/TrashIcon";
 
 export default function Home() {
   const getInitialFavorites = (): FavoriteLocation[] => {
@@ -49,55 +54,43 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col w-full min-h-screen bg-slate-50">
-      <div className="h-[500px]">
+    <div className="flex flex-col w-full min-h-screen bg-secondary-50">
+      <div className="h-[300]">
         <MapWidget onSave={handleSaveFavorite} focusCoords={focusCoords} />
       </div>
+
       <div className="p-8 bg-white shadow-inner flex-1">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            ⭐ Meus Locais Favoritos ({favorites.length})
-          </h2>
+          <header className="flex justify-between items-center mb-6">
+            {favorites.length > 0 && (
+              <>
+              <h3 className="flex items-center gap-2 font-bold text-secondary-900">
+              <StarIcon size={24} />
+               Meus Locais Favoritos
+            </h3>
+              <ButtonBase variant="danger" size="sm" onClick={clearAllFavorites}>
+                  <TrashIcon size={16} className="text-white" />
+                  Limpar Tudo
+              </ButtonBase>
+              
+            </>
+            )}
+          </header>
+
           {favorites.length === 0 ? (
-            <div className="text-center py-10 border-2 border-dashed border-slate-200 rounded-xl">
-              <p className="text-slate-400">
-                Nenhum favorito salvo. Use o mapa acima para encontrar e salvar
-                locais!
-              </p>
-            </div>
+            <EmptyState />
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {favorites.map((fav) => (
-                <div
+                
+                <FavoriteCard
                   key={fav.id}
-                  onClick={() => setFocusCoords(fav.coords)}
-                  className="p-4 border rounded-xl bg-white shadow-sm hover:border-emerald-500 cursor-pointer transition-all active:scale-[0.98]"
-                >
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-emerald-800 line-clamp-1">
-                      {fav.name}
-                    </h3>
-                    <button
-                      onClick={(e) => removeFavorite(fav.id, e)}
-                      className="text-slate-300 hover:text-red-500 transition-colors"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                  <p className="text-xs text-slate-500 leading-tight line-clamp-2">
-                    {fav.address}
-                  </p>
-                </div>
+                  favorite={fav}
+                  onSelect={setFocusCoords}
+                  onRemove={removeFavorite}
+                />
               ))}
             </div>
-          )}
-          {favorites.length > 0 && (
-            <button
-              onClick={clearAllFavorites}
-              className="text-xs font-semibold text-red-500 hover:bg-red-50 px-3 py-2 rounded-lg transition-colors border border-red-100"
-            >
-              🗑️ Limpar Tudo
-            </button>
           )}
         </div>
       </div>
