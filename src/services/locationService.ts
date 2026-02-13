@@ -15,9 +15,9 @@ export const locationService = {
   return firstResult;
 },
 
-  async searchByCoords({ lat, long }: Coords): Promise<AddressResponse> {
+  async searchByCoords({ lat, lng }: Coords): Promise<AddressResponse> {
     const response = await fetch(
-      `${BASE_URL}/reverse?lat=${lat}&lon=${long}&format=jsonv2`,
+      `${BASE_URL}/reverse?lat=${lat}&lon=${lng}&format=jsonv2`,
       { headers: { "Accept-Language": "pt-BR" } },
     );
     if (!response.ok) throw new Error("Erro ao obter endereço");

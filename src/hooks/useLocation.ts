@@ -1,11 +1,11 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { locationService } from "../services/locationService";
 
-export function useReverseLocation(lat?: number, long?: number) {
+export function useReverseLocation(lat?: number, lng?: number) {
   return useQuery({
-    queryKey: ["location", lat, long],
-    queryFn: () => locationService.searchByCoords({ lat: lat!, long: long! }),
-    enabled: !!lat && !!long, 
+    queryKey: ["location", lat, lng],
+    queryFn: () => locationService.searchByCoords({ lat: lat!, lng: lng! }),
+    enabled: !!lat && !!lng, 
     staleTime: 1000 * 60 * 10,
   });
 }

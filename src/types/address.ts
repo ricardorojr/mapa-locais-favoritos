@@ -18,7 +18,7 @@ export interface AddressDetails {
 
 export interface Coords {
   lat: number;
-  long: number;
+  lng: number;
 }
 
 export interface FavoriteLocation {
