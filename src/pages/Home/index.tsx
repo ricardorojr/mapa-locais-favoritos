@@ -1,54 +1,26 @@
 import { useState } from "react";
 import MapWidget from "../../components/Map/MapWidget";
-import type { FavoriteLocation } from "../../types/address";
 import { ButtonBase } from "../../components/UI/ButtonBase";
 import { EmptyState } from "../../components/Favorites/EmptyListFavorite";
 import { FavoriteCard } from "../../components/Favorites/FavoriteCard";
 import { StarIcon } from "../../assets/icons/StarIcon";
 import { ModalBase } from "../../components/UI/ModalBase";
 import { TrashIcon } from "../../assets/icons/TrashIcon";
+import { useFavorites } from "../../hooks/useFavorites";
 
 export default function Home() {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [focusCoords, setFocusCoords] = useState<[number, number] | null>(null);
-
-  const getInitialFavorites = (): FavoriteLocation[] => {
-    if (typeof window === "undefined") return [];
-
-    const saved = localStorage.getItem("@MapApp:favorites");
-    if (!saved) return [];
-
-    try {
-      return JSON.parse(saved);
-    } catch (e) {
-      console.error("Erro ao carregar favoritos", e);
-      return [];
-    }
-  };
-  const [favorites, setFavorites] = useState<FavoriteLocation[]>(getInitialFavorites);
-
-  const handleSaveFavorite = (newLocation: FavoriteLocation): boolean => {
-  const isDuplicate = favorites.some((f) => f.address === newLocation.address);
-  if (isDuplicate) {
-    return false;
-  }
   
-  const updated = [newLocation, ...favorites];
-  setFavorites(updated);
-  localStorage.setItem("@MapApp:favorites", JSON.stringify(updated));
-  return true;
-  };
+  const { 
+    favorites, 
+    handleSaveFavorite, 
+    removeFavorite, 
+    clearFavorites 
+  } = useFavorites();
 
-  const removeFavorite = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const updated = favorites.filter((f) => f.id !== id);
-    setFavorites(updated);
-    localStorage.setItem("@MapApp:favorites", JSON.stringify(updated));
-  };
-
-  const handleClearAll = () => {
-    setFavorites([]);
-    localStorage.removeItem("@MapApp:favorites");
+  const handleConfirmClear = () => {
+    clearFavorites();
     setIsConfirmOpen(false);
   };
 
@@ -57,28 +29,47 @@ export default function Home() {
       <div className="50vh">
         <MapWidget onSave={handleSaveFavorite} focusCoords={focusCoords} />
       </div>
+
       <div className="p-8 bg-white shadow-inner flex-1">
         <div className="max-w-6xl mx-auto">
           <header className="flex justify-between items-center mb-6">
             {favorites.length > 0 && (
               <>
                 <h3 className="flex items-center gap-2 font-bold text-secondary-900">
-                <StarIcon size={24} />
+                  <StarIcon size={24} />
                   Meus Locais Favoritos
                 </h3>
-                <ButtonBase variant="danger" size="sm" onClick={() => setIsConfirmOpen(true)}>
-                    <TrashIcon size={16} className="text-white" />
-                    Limpar Tudo
+                
+                <ButtonBase 
+                  variant="danger" 
+                  size="sm" 
+                  onClick={() => setIsConfirmOpen(true)}
+                >
+                  <TrashIcon size={16} className="text-white" />
+                  Limpar Tudo
                 </ButtonBase>
+
                 <ModalBase isOpen={isConfirmOpen} onClose={() => setIsConfirmOpen(false)}>
-                  <div className="text-center">
-                    <h3 className="text-secondary-600 text-lg font-bold" >Você tem certeza que deseja apagar todos os favoritos?</h3>
-                    <p className="text-sm text-secondary-600 my-4">Esta ação não pode ser desfeita.</p>
+                  <div className="text-center p-4">
+                    <h3 className="text-secondary-600 text-lg font-bold">
+                      Você tem certeza que deseja apagar todos os favoritos?
+                    </h3>
+                    <p className="text-sm text-secondary-600 my-4">
+                      Esta ação não pode ser desfeita.
+                    </p>
                     <div className="flex gap-3">
-                      <ButtonBase variant="outline" className="flex-1" onClick={() => setIsConfirmOpen(false)}>
+                      <ButtonBase 
+                        variant="outline" 
+                        className="flex-1" 
+                        onClick={() => setIsConfirmOpen(false)}
+                      >
                         Cancelar
                       </ButtonBase>
-                      <ButtonBase variant="danger" className="flex-1" onClick={handleClearAll}>
+                      <ButtonBase 
+                        variant="danger" 
+                        className="flex-1" 
+                        onClick={handleConfirmClear}
+                      >
                         Confirmar
                       </ButtonBase>
                     </div>
