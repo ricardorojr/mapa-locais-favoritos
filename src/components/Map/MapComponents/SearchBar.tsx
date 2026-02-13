@@ -3,6 +3,7 @@ import type { LatLngExpression } from "leaflet";
 import { TextInput } from "../../UI/TextInput";
 import { ButtonBase } from "../../UI/ButtonBase";
 import { useSearchLocation } from "../../../hooks/useLocation";
+import { cn } from "../../../utils/cn";
 
 interface SearchBarProps {
   onSearch: (pos: LatLngExpression, label: string) => void;
@@ -37,8 +38,12 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
 
   return (
     <div
-      className="flex flex-col gap-2 p-4 bg-white/90 backdrop-blur-sm shadow-xl 
-        rounded-xl absolute top-4 right-4 z-map-overlay w-72 border border-secondary-200"
+      className={cn(
+        "flex flex-col gap-2 p-4 bg-white/90 backdrop-blur-sm shadow-xl border border-secondary-200",
+        "relative w-full",
+        "md:absolute md:top-4 md:right-4 md:w-72 md:z-[1000]",
+        "rounded-xl",
+      )}
     >
       <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
         Buscar Localização

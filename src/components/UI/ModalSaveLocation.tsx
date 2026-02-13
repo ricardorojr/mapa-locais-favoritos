@@ -12,7 +12,7 @@ import { ButtonBase } from "./ButtonBase";
 interface ModalSaveLocationProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (name: string) => boolean
+  onConfirm: (name: string) => boolean;
   coords: [number, number] | null;
 }
 
@@ -64,7 +64,7 @@ export function ModalSaveLocation({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <DialogPanel className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl">
+            <DialogPanel className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl relative z-[9999]">
               <DialogTitle className="text-lg font-bold text-secondary-900 mb-4">
                 Salvar Local Favorito
               </DialogTitle>

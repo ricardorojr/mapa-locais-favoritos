@@ -32,6 +32,7 @@ export default function Home() {
   if (isDuplicate) {
     return false;
   }
+  
   const updated = [newLocation, ...favorites];
   setFavorites(updated);
   localStorage.setItem("@MapApp:favorites", JSON.stringify(updated));

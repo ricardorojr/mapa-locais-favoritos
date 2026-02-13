@@ -16,7 +16,6 @@ import { LocationPopup } from "./MapComponents/LocationPopup";
 import { useFormattedAddress } from "../../hooks/useFormattedAddress";
 import { ModalSaveLocation } from "../UI/ModalSaveLocation";
 
-
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
   iconRetinaUrl: markerIcon2x,
@@ -32,18 +31,20 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const DEFAULT_POSITION: LatLngExpression = [-18.9186, -48.2772];
 
 interface MapWidgetProps {
-  onSave: (location: FavoriteLocation) => boolean; 
+  onSave: (location: FavoriteLocation) => boolean;
   focusCoords: [number, number] | null;
 }
 
 export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
-  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
+  const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(
+    null,
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const markerRef = useRef<L.Marker>(null);
 
   const { data: reverseData, isFetching } = useReverseLocation(
-    markerPosition?.[0], 
-    markerPosition?.[1]
+    markerPosition?.[0],
+    markerPosition?.[1],
   );
 
   const addressLines = useFormattedAddress(reverseData, isFetching);
@@ -76,35 +77,46 @@ export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
   };
 
   return (
-    <div className="h-[80vh] w-full flex flex-row relative border rounded-xl overflow-hidden shadow-lg border-secondary-200">
-      <MapContainer center={DEFAULT_POSITION} zoom={13} className="h-full w-full z-0">
-        {markerPosition && <ChangeView center={markerPosition} />}
-        
-        <TileLayer 
-          attribution='&copy; OpenStreetMap' 
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" 
-        />
+    <div className="flex flex-col md:relative md:h-[80vh] w-full border rounded-xl overflow-hidden shadow-lg border-secondary-200">
+      <div className="h-96 md:h-full w-full z-0 relative">
+        <MapContainer
+          center={DEFAULT_POSITION}
+          zoom={13}
+          className="h-full w-full"
+        >
+          {markerPosition && <ChangeView center={markerPosition} />}
 
-        <ClickHandler onClick={(lat, lng) => updateLocation([lat, lng])} />
+          <TileLayer
+            attribution="&copy; OpenStreetMap"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
 
-        {markerPosition && (
-          <Marker position={markerPosition} ref={markerRef}>
-            <Popup autoPan key={`popup-${markerPosition[0]}-${markerPosition[1]}`}>
-              <LocationPopup 
-                addressLines={addressLines}
-                isFetching={isFetching}
-                onSave={() => setIsModalOpen(true)}
-              />
-            </Popup>
-          </Marker>
-        )}
-      </MapContainer>
+          <ClickHandler onClick={(lat, lng) => updateLocation([lat, lng])} />
+
+          {markerPosition && (
+            <Marker position={markerPosition} ref={markerRef}>
+              <Popup
+                autoPan
+                key={`popup-${markerPosition[0]}-${markerPosition[1]}`}
+              >
+                <LocationPopup
+                  addressLines={addressLines}
+                  isFetching={isFetching}
+                  onSave={() => setIsModalOpen(true)}
+                  disabled={!reverseData}
+                  
+                />
+              </Popup>
+            </Marker>
+          )}
+        </MapContainer>
+      </div>
       <SearchBar onSearch={(pos) => updateLocation(pos as [number, number])} />
       <ModalSaveLocation
         isOpen={isModalOpen}
-          coords={markerPosition}
-          onClose={() => setIsModalOpen(false)}
-          onConfirm={handleConfirmSave}
+        coords={markerPosition}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleConfirmSave}
       />
     </div>
   );
