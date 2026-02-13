@@ -1,6 +1,6 @@
 import type { Coords, AddressResponse } from "../types/address";
 
-const BASE_URL = "https://nominatim.openstreetmap.org";
+const BASE_URL = import.meta.env.VITE_API_URL;
 
 export const locationService = {
   async searchByText(address: string): Promise<AddressResponse | undefined> {
