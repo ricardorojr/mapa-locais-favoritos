@@ -14,6 +14,8 @@ import SearchBar from "./MapComponents/SearchBar";
 import { useReverseLocation } from "../../hooks/useLocation";
 import { LocationPopup } from "./MapComponents/LocationPopup";
 import { useFormattedAddress } from "../../hooks/useFormattedAddress";
+import { ModalSaveLocation } from "../UI/ModalSaveLocation";
+
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,
@@ -30,12 +32,13 @@ L.Marker.prototype.options.icon = DefaultIcon;
 const DEFAULT_POSITION: LatLngExpression = [-18.9186, -48.2772];
 
 interface MapWidgetProps {
-  onSave: (location: FavoriteLocation) => void;
+  onSave: (location: FavoriteLocation) => boolean; 
   focusCoords: [number, number] | null;
 }
 
 export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
   const [markerPosition, setMarkerPosition] = useState<[number, number] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const markerRef = useRef<L.Marker>(null);
 
   const { data: reverseData, isFetching } = useReverseLocation(
@@ -60,6 +63,18 @@ export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
     }
   }, [markerPosition, reverseData]);
 
+  const handleConfirmSave = (chosenName: string): boolean => {
+    if (markerPosition) {
+      return onSave({
+        id: crypto.randomUUID(),
+        name: chosenName,
+        address: addressLines.join(", "),
+        coords: markerPosition,
+      });
+    }
+    return false;
+  };
+
   return (
     <div className="h-[80vh] w-full flex flex-row relative border rounded-xl overflow-hidden shadow-lg border-secondary-200">
       <MapContainer center={DEFAULT_POSITION} zoom={13} className="h-full w-full z-0">
@@ -78,19 +93,19 @@ export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
               <LocationPopup 
                 addressLines={addressLines}
                 isFetching={isFetching}
-                onSave={() => onSave({
-                  id: crypto.randomUUID(),
-                  name: addressLines[0] || "Local Selecionado",
-                  address: addressLines.join(", "),
-                  coords: markerPosition,
-                })}
+                onSave={() => setIsModalOpen(true)}
               />
             </Popup>
           </Marker>
         )}
       </MapContainer>
-
       <SearchBar onSearch={(pos) => updateLocation(pos as [number, number])} />
+      <ModalSaveLocation
+        isOpen={isModalOpen}
+          coords={markerPosition}
+          onClose={() => setIsModalOpen(false)}
+          onConfirm={handleConfirmSave}
+      />
     </div>
   );
 }

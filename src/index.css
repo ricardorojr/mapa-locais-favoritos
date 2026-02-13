@@ -15,6 +15,9 @@
   --color-alert-warning: #f59e0b;
   --color-alert-success: #22c55e;
   --color-alert-info: #3b82f6;
+
+  --z-index-map-overlay: 1000;
+  --z-index-modal: 5000;
 }
 
 :root {

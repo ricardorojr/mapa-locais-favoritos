@@ -30,6 +30,16 @@ export function FavoriteCard({ favorite, onSelect, onRemove }: FavoriteCardProps
       <p className="text-xs text-secondary-600 leading-tight line-clamp-2">
         {favorite.address}
       </p>
+      <div className="flex gap-3 pt-3 border-t border-secondary-100">
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-secondary-400 uppercase tracking-tighter">Latitude</span>
+          <span className="text-xs font-mono text-secondary-700">{favorite.coords[0].toFixed(6)}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="text-[10px] font-bold text-secondary-400 uppercase tracking-tighter">Longitude</span>
+          <span className="text-xs font-mono text-secondary-700">{favorite.coords[1].toFixed(6)}</span>
+        </div>
+      </div>
     </div>
   );
 }

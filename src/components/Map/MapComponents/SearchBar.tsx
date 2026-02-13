@@ -36,7 +36,10 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
   };
 
   return (
-    <div className="flex flex-col gap-2 p-4 bg-white/90 backdrop-blur-sm shadow-xl rounded-xl absolute top-4 right-4 z-[1000] w-72 border border-slate-200">
+    <div
+      className="flex flex-col gap-2 p-4 bg-white/90 backdrop-blur-sm shadow-xl 
+        rounded-xl absolute top-4 right-4 z-map-overlay w-72 border border-secondary-200"
+    >
       <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">
         Buscar Localização
       </h3>
