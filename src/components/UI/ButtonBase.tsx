@@ -1,5 +1,5 @@
 import { Button, type ButtonProps } from "@headlessui/react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../shared/utils/cn";
 
 interface ButtonBaseProps extends ButtonProps {
   variant?: "primary" | "secondary" | "danger" | "outline";

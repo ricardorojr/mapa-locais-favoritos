@@ -1,7 +1,12 @@
-import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react";
+import {
+  Dialog,
+  DialogPanel,
+  Transition,
+  TransitionChild,
+} from "@headlessui/react";
 import { Fragment } from "react";
 import type { ReactNode } from "react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../shared/utils/cn";
 
 interface ModalBaseProps {
   isOpen: boolean;
@@ -10,7 +15,12 @@ interface ModalBaseProps {
   className?: string;
 }
 
-export function ModalBase({ isOpen, onClose, children, className }: ModalBaseProps) {
+export function ModalBase({
+  isOpen,
+  onClose,
+  children,
+  className,
+}: ModalBaseProps) {
   return (
     <Transition show={isOpen} as={Fragment}>
       <Dialog onClose={onClose} className="relative z-modal">
@@ -36,7 +46,12 @@ export function ModalBase({ isOpen, onClose, children, className }: ModalBasePro
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <DialogPanel className={cn("w-full max-w-md rounded-xl bg-white p-6 shadow-2xl", className)}>
+            <DialogPanel
+              className={cn(
+                "w-full max-w-md rounded-xl bg-white p-6 shadow-2xl",
+                className,
+              )}
+            >
               {children}
             </DialogPanel>
           </TransitionChild>

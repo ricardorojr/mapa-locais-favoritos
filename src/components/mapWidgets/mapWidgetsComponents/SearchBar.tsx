@@ -3,7 +3,7 @@ import type { LatLngExpression } from "leaflet";
 import { TextInput } from "../../ui/TextInput";
 import { ButtonBase } from "../../ui/ButtonBase";
 import { useSearchLocation } from "../../../hooks/useServiceLocation";
-import { cn } from "../../../utils/cn";
+import { cn } from "../../../shared/utils/cn";
 
 interface SearchBarProps {
   onSearch: (pos: LatLngExpression, label: string) => void;

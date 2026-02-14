@@ -1,4 +1,4 @@
-import { cn } from "../../utils/cn";
+import { cn } from "../../shared/utils/cn";
 
 interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: number;

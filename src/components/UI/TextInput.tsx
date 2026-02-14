@@ -1,5 +1,5 @@
 import { Input, type InputProps } from "@headlessui/react";
-import { cn } from "../../utils/cn";
+import { cn } from "../../shared/utils/cn";
 
 interface TextInputProps extends InputProps {
   error?: boolean;
