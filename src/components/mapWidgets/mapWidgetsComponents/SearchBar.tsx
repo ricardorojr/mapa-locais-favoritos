@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { LatLngExpression } from "leaflet";
 import { TextInput } from "../../UI/TextInput";
 import { ButtonBase } from "../../UI/ButtonBase";
-import { useSearchLocation } from "../../../hooks/useLocation";
+import { useSearchLocation } from "../../../hooks/useServiceLocation";
 import { cn } from "../../../utils/cn";
 
 interface SearchBarProps {

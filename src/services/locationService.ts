@@ -1,26 +1,39 @@
 import type { Coords, AddressResponse } from "../types/address";
+import { createAppError } from "../core/errors";
+import { httpClient } from "../core/httpClient";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
 
-export const locationService = {
-  async searchByText(address: string): Promise<AddressResponse | undefined> {
-  const response = await fetch(
+export const searchByAddress = async (
+  address: string,
+  signal?: AbortSignal
+): Promise<AddressResponse> => {
+
+  const data = await httpClient.get<AddressResponse[]>(
     `${BASE_URL}/search?q=${encodeURIComponent(address)}&format=jsonv2&limit=1`,
-    { headers: { "Accept-Language": "pt-BR" } }
+    signal
   );
 
-  if (!response.ok) throw new Error("Erro na busca");
-  
-  const [firstResult] = await response.json();
-  return firstResult;
-},
+  if (!Array.isArray(data) || data.length === 0) {
+    throw createAppError("Endereço não encontrado.", "LOCATION_NOT_FOUND");
+  }
 
-  async searchByCoords({ lat, lng }: Coords): Promise<AddressResponse> {
-    const response = await fetch(
-      `${BASE_URL}/reverse?lat=${lat}&lon=${lng}&format=jsonv2`,
-      { headers: { "Accept-Language": "pt-BR" } },
-    );
-    if (!response.ok) throw new Error("Erro ao obter endereço");
-    return await response.json();
-  },
+  return data[0];
+};
+
+export const searchByCoords = async (
+  { lat, lng }: Coords,
+  signal?: AbortSignal
+): Promise<AddressResponse> => {
+
+  const data = await httpClient.get<AddressResponse | { error: string }>(
+    `${BASE_URL}/reverse?lat=${lat}&lon=${lng}&format=jsonv2`,
+    signal
+  );
+
+  if ("error" in data) {
+    throw createAppError("Endereço inválido.", "LOCATION_NOT_FOUND");
+  }
+
+  return data;
 };

@@ -1,8 +1,8 @@
 import { useState } from "react";
-import MapWidget from "../../components/Map/MapWidget";
+import MapWidget from "../../components/mapWidgets/MapWidget";
 import { ButtonBase } from "../../components/UI/ButtonBase";
-import { EmptyState } from "../../components/Favorites/EmptyListFavorite";
-import { FavoriteCard } from "../../components/Favorites/FavoriteCard";
+import { EmptyState } from "../../components/favorites/EmptyListFavorite";
+import { FavoriteCard } from "../../components/favorites/FavoriteCard";
 import { StarIcon } from "../../assets/icons/StarIcon";
 import { ModalBase } from "../../components/UI/ModalBase";
 import { TrashIcon } from "../../assets/icons/TrashIcon";

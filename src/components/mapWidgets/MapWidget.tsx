@@ -8,11 +8,11 @@ import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 import type { FavoriteLocation } from "../../types/address";
 
-import ChangeView from "./MapComponents/ChangeView";
-import ClickHandler from "./MapComponents/ClickHandler";
-import SearchBar from "./MapComponents/SearchBar";
-import { useReverseLocation } from "../../hooks/useLocation";
-import { LocationPopup } from "./MapComponents/LocationPopup";
+import ChangeView from "./mapWidgetsComponents/ChangeView";
+import ClickHandler from "./mapWidgetsComponents/ClickHandler";
+import SearchBar from "./mapWidgetsComponents/SearchBar";
+import { useReverseLocation } from "../../hooks/useServiceLocation";
+import { LocationPopup } from "./mapWidgetsComponents/LocationPopup";
 import { useFormattedAddress } from "../../hooks/useFormattedAddress";
 import { ModalSaveLocation } from "../UI/ModalSaveLocation";
 
