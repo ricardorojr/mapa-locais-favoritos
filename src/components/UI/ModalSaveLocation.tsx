@@ -88,7 +88,7 @@ export function ModalSaveLocation({
               <div className="space-y-4">
                 <TextInput
                   label="Nome do Local"
-                  placeholder="Ex: Casa, Trabalho..."
+                  placeholder="Ex: Casa, Trabalho ou Local Favorito."
                   value={name}
                   onChange={(e) => {
                     setName(e.target.value);
