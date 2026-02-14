@@ -13,13 +13,19 @@ export function useFavorites() {
   });
 
   const handleSaveFavorite = useCallback((newLocation: FavoriteLocation) => {
+    let isNew = true;
+
     setFavorites((prev) => {
-      if (prev.some((f) => f.address === newLocation.address)) return prev;
+      if (prev.some((f) => f.address === newLocation.address)) {
+        isNew = false;
+        return prev;
+      }
       const updated = [newLocation, ...prev];
       localStorage.setItem("@MapApp:favorites", JSON.stringify(updated));
       return updated;
     });
-    return true;
+
+    return isNew;
   }, []);
 
   const removeFavorite = useCallback((id: string, e?: React.MouseEvent) => {
