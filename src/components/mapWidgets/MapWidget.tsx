@@ -14,7 +14,7 @@ import SearchBar from "./mapWidgetsComponents/SearchBar";
 import { useReverseLocation } from "../../hooks/useServiceLocation";
 import { LocationPopup } from "./mapWidgetsComponents/LocationPopup";
 import { useFormattedAddress } from "../../hooks/useFormattedAddress";
-import { ModalSaveLocation } from "../UI/ModalSaveLocation";
+import { ModalSaveLocation } from "../ui/ModalSaveLocation";
 
 const DefaultIcon = L.icon({
   iconUrl: markerIcon,

@@ -1,4 +1,4 @@
-import { ButtonBase } from "../../UI/ButtonBase";
+import { ButtonBase } from "../../ui/ButtonBase";
 import { StarIcon } from "../../../assets/icons/StarIcon";
 
 interface LocationPopupProps {

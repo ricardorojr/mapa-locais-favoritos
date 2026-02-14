@@ -1,10 +1,10 @@
 import { useState } from "react";
 import MapWidget from "../../components/mapWidgets/MapWidget";
-import { ButtonBase } from "../../components/UI/ButtonBase";
+import { ButtonBase } from "../../components/ui/ButtonBase";
 import { EmptyState } from "../../components/favorites/EmptyListFavorite";
 import { FavoriteCard } from "../../components/favorites/FavoriteCard";
 import { StarIcon } from "../../assets/icons/StarIcon";
-import { ModalBase } from "../../components/UI/ModalBase";
+import { ModalBase } from "../../components/ui/ModalBase";
 import { TrashIcon } from "../../assets/icons/TrashIcon";
 import { useFavorites } from "../../hooks/useFavorites";
 

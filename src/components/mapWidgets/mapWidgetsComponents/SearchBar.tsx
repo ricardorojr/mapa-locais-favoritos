@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { LatLngExpression } from "leaflet";
-import { TextInput } from "../../UI/TextInput";
-import { ButtonBase } from "../../UI/ButtonBase";
+import { TextInput } from "../../ui/TextInput";
+import { ButtonBase } from "../../ui/ButtonBase";
 import { useSearchLocation } from "../../../hooks/useServiceLocation";
 import { cn } from "../../../utils/cn";
 
