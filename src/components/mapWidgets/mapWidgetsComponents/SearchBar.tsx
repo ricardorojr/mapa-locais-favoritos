@@ -41,7 +41,7 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
       className={cn(
         "flex flex-col gap-2 p-4 bg-white/90 backdrop-blur-sm shadow-xl border border-secondary-200",
         "relative w-full",
-        "md:absolute md:top-4 md:right-4 md:w-72 md:z-[1000]",
+        "md:absolute md:top-4 md:right-4 md:w-72 md:z-map-overlay",
         "rounded-xl",
       )}
     >

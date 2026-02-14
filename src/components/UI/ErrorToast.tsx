@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useGlobalError } from "../../shared/errors/error-provider/error-context";
+import { cn } from "../../shared/utils/cn";
 
 export function ErrorToast() {
   const { error, clearError } = useGlobalError();
@@ -14,25 +15,45 @@ export function ErrorToast() {
     return () => {
       clearTimeout(timer);
     };
-  }, [error]);
+  }, [error, clearError]);
 
   if (!error) return null;
 
   return (
-    <div className="fixed top-6 right-6 z-[9999]">
-      <div className="bg-white border border-red-200 shadow-xl rounded-xl px-5 py-4 w-80 animate-slide-in">
-        <div className="flex items-start gap-3">
-          <div className="text-red-500 text-lg">⚠️</div>
-
-          <div className="flex-1">
-            <p className="text-sm font-medium text-gray-800">{error}</p>
+    <div
+      className={cn(
+        "fixed transition-all duration-300",
+        "z-10000",
+        "top-4 right-4",
+        "max-[320px]:top-2 max-[320px]:right-2",
+      )}
+    >
+      <div
+        className={cn(
+          "bg-secondary-50 border shadow-xl rounded-xl px-5 py-4 animate-slide-in",
+          "border-alert-danger/20",
+          "w-80",
+          "max-[350px]:w-[calc(100vw-24px)]",
+          "max-[320px]:px-3 max-[320px]:py-3",
+        )}
+      >
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <p
+              className={cn(
+                "text-sm font-medium text-secondary-900 leading-tight",
+                "overflow-wrap-anywhere",
+              )}
+            >
+              {error}
+            </p>
           </div>
 
           <button
             onClick={clearError}
-            className="text-gray-400 hover:text-gray-600 transition"
+            className="text-secondary-600 hover:text-secondary-900 transition-colors shrink-0 p-1"
           >
-            ✕
+            <span className="text-lg font-bold leading-none">✕</span>
           </button>
         </div>
       </div>

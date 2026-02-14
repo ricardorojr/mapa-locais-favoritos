@@ -8,6 +8,7 @@ import {
 import { Fragment, useState } from "react";
 import { TextInput } from "./TextInput";
 import { ButtonBase } from "./ButtonBase";
+import { cn } from "../../shared/utils/cn";
 
 interface ModalSaveLocationProps {
   isOpen: boolean;
@@ -41,7 +42,11 @@ export function ModalSaveLocation({
 
   return (
     <Transition show={isOpen} as={Fragment}>
-      <Dialog onClose={onClose} className="relative z-50">
+      <Dialog
+        onClose={onClose}
+        className="relative"
+        style={{ zIndex: "var(--z-index-modal)" }}
+      >
         <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
@@ -54,7 +59,13 @@ export function ModalSaveLocation({
           <div className="fixed inset-0 bg-black/30 backdrop-blur-sm" />
         </TransitionChild>
 
-        <div className="fixed inset-0 flex items-center justify-center p-4">
+        <div
+          className={cn(
+            "fixed inset-0 flex p-4 transition-all",
+            "items-center justify-center",
+            "max-[354px]:justify-end max-[354px]:items-center",
+          )}
+        >
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -64,8 +75,13 @@ export function ModalSaveLocation({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <DialogPanel className="w-full max-w-md rounded-xl bg-white p-6 shadow-2xl relative z-[9999]">
-              <DialogTitle className="text-lg font-bold text-secondary-900 mb-4">
+            <DialogPanel
+              className={cn(
+                "w-full max-w-md rounded-xl bg-secondary-50 p-6 shadow-2xl relative",
+                "max-[320px]:max-w-70 max-[320px]:p-4",
+              )}
+            >
+              <DialogTitle className="text-lg font-bold text-secondary-600 mb-4">
                 Salvar Local Favorito
               </DialogTitle>
 
@@ -83,13 +99,21 @@ export function ModalSaveLocation({
                   autoFocus
                 />
                 <div className="p-3 bg-secondary-50 rounded-lg border border-secondary-200">
-                  <p className="text-[10px] font-bold text-secondary-400 uppercase">
+                  <p className="text-[10px] font-bold text-secondary-600 uppercase mb-1">
                     Coordenadas
                   </p>
-                  <p className="text-xs text-secondary-600 font-mono">
-                    Lat: {coords?.[0].toFixed(6)} | Lng:{" "}
-                    {coords?.[1].toFixed(6)}
-                  </p>
+                  <div
+                    className={cn(
+                      "text-xs text-secondary-600 font-mono flex gap-2",
+                      "max-[325px]:flex-col max-[325px]:gap-0.5",
+                    )}
+                  >
+                    <span>Lat: {coords?.[0].toFixed(6)}</span>
+                    <span className="max-[325px]:hidden text-secondary-200">
+                      |
+                    </span>
+                    <span>Lng: {coords?.[1].toFixed(6)}</span>
+                  </div>
                 </div>
 
                 <div className="flex gap-3 mt-6">
@@ -101,7 +125,7 @@ export function ModalSaveLocation({
                     Cancelar
                   </ButtonBase>
                   <ButtonBase
-                    className="flex-1"
+                    className="flex-1 bg-primary-500 hover:bg-primary-600 text-white"
                     disabled={!name.trim()}
                     onClick={handleConfirm}
                   >
