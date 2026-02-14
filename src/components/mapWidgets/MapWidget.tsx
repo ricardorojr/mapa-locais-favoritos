@@ -41,6 +41,7 @@ export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
   );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const markerRef = useRef<L.Marker>(null);
+  const [mapBounds, setMapBounds] = useState<number[][] | null>(null);
 
   const { data: reverseData, isFetching } = useReverseLocation(
     markerPosition?.[0],
@@ -49,8 +50,9 @@ export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
 
   const addressLines = useFormattedAddress(reverseData, isFetching);
 
-  const updateLocation = (coords: [number, number]) => {
+  const updateLocation = (coords: [number, number], bounds?: number[][]) => {
     setMarkerPosition(coords);
+    setMapBounds(bounds || null);
   };
 
   useEffect(() => {
@@ -84,8 +86,10 @@ export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
           zoom={13}
           className="h-full w-full"
         >
-          {markerPosition && <ChangeView center={markerPosition} />}
-
+          {markerPosition && (
+            <ChangeView center={markerPosition} bounds={mapBounds} />
+          )}
+          
           <TileLayer
             attribution="&copy; OpenStreetMap"
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -111,7 +115,7 @@ export default function MapWidget({ onSave, focusCoords }: MapWidgetProps) {
           )}
         </MapContainer>
       </div>
-      <SearchBar onSearch={(pos) => updateLocation(pos as [number, number])} />
+      <SearchBar onSearch={(pos, bounds) => updateLocation(pos as [number, number], bounds)} />
       <ModalSaveLocation
         isOpen={isModalOpen}
         coords={markerPosition}

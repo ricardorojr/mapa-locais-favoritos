@@ -4,6 +4,7 @@ export interface AddressResponse {
   lon: string;
   display_name: string;
   address: AddressDetails;
+  boundingbox: [string, string, string, string]; 
 }
 
 export interface AddressDetails {

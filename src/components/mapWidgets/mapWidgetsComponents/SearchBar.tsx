@@ -1,12 +1,11 @@
 import { useState } from "react";
-import type { LatLngExpression } from "leaflet";
 import { TextInput } from "../../ui/TextInput";
 import { ButtonBase } from "../../ui/ButtonBase";
 import { useSearchLocation } from "../../../hooks/useServiceLocation";
 import { cn } from "../../../shared/utils/cn";
 
 interface SearchBarProps {
-  onSearch: (pos: LatLngExpression, label: string) => void;
+  onSearch: (pos: [number, number], bounds?: number[][]) => void;
 }
 
 export default function SearchBar({ onSearch }: SearchBarProps) {
@@ -25,7 +24,12 @@ export default function SearchBar({ onSearch }: SearchBarProps) {
       if (data) {
         const lat = parseFloat(data.lat);
         const lon = parseFloat(data.lon);
-        onSearch([lat, lon], data.display_name);
+        const bbox = data.boundingbox.map(Number);
+        const bounds = [
+          [bbox[0], bbox[2]],
+          [bbox[1], bbox[3]],
+        ];
+        onSearch([lat, lon], bounds);
         setValue("");
       } else {
         setNotFound(true);
